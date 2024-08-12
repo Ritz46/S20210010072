@@ -19,10 +19,10 @@ async function fetchNumbersByType(type) {
       url = `${NUMBER_API_URL}/primes`;
       break;
     case 'f':
-      url = `${NUMBER_API_URL}/fibonacci`;
+      url = `${NUMBER_API_URL}/fibo`;
       break;
     case 'r':
-      url = `${NUMBER_API_URL}/random`;
+      url = `${NUMBER_API_URL}/rand`;
       break;
     default:
       return [];
