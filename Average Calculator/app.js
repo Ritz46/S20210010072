@@ -2,27 +2,27 @@ const express = require('express');
 const axios = require('axios');
 const app = express();
 
-const SERVER_PORT = 9876;
-const NUMBER_API_URL = 'http://20.244.56.144/test';
-const RECENT_NUMBERS_LIMIT = 10;
+const port_no = 9876;
+const test_url = 'http://20.244.56.144/test';
+const window_lim = 10;
 
-const BEARER_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYXBDbGFpbXMiOnsiZXhwIjoxNzIzNDc1OTI5LCJpYXQiOjE3MjM0NzU2MjksImlzcyI6IkFmZm9yZG1lZCIsImp0aSI6IjI5MzhmMTk0LWI5NGEtNDZiMS1iZTNmLTdjZWM2NDM3MjgzZSIsInN1YiI6InJpdGhpY2suZTIxQGlpaXRzLmluIn0sImNvbXBhbnlOYW1lIjoiRm9uaXgiLCJjbGllbnRJRCI6IjI5MzhmMTk0LWI5NGEtNDZiMS1iZTNmLTdjZWM2NDM3MjgzZSIsImNsaWVudFNlY3JldCI6Ilh6U3hIdmxpendDbnhYdEwiLCJvd25lck5hbWUiOiJSaXRoaWNrIiwib3duZXJFbWFpbCI6InJpdGhpY2suZTIxQGlpaXRzLmluIiwicm9sbE5vIjoiUzIwMjEwMDEwMDcyIn0.iLextkuXfFDjAgXLOwtZO6NK4Hdpj2t9k2BJkRwBnIs';
-let recentNumbers = [];
+const BEARER_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYXBDbGFpbXMiOnsiZXhwIjoxNzIzNDc2MzgxLCJpYXQiOjE3MjM0NzYwODEsImlzcyI6IkFmZm9yZG1lZCIsImp0aSI6IjI5MzhmMTk0LWI5NGEtNDZiMS1iZTNmLTdjZWM2NDM3MjgzZSIsInN1YiI6InJpdGhpY2suZTIxQGlpaXRzLmluIn0sImNvbXBhbnlOYW1lIjoiRm9uaXgiLCJjbGllbnRJRCI6IjI5MzhmMTk0LWI5NGEtNDZiMS1iZTNmLTdjZWM2NDM3MjgzZSIsImNsaWVudFNlY3JldCI6Ilh6U3hIdmxpendDbnhYdEwiLCJvd25lck5hbWUiOiJSaXRoaWNrIiwib3duZXJFbWFpbCI6InJpdGhpY2suZTIxQGlpaXRzLmluIiwicm9sbE5vIjoiUzIwMjEwMDEwMDcyIn0.0j9mjC1iK40leUYBvZCzuzM-LNRv3XorIrW1UiDkTZ0';
+let nums = [];
 
 async function fetchNumbersByType(type) {
   let url;
   switch (type) {
     case 'e':
-      url = `${NUMBER_API_URL}/even`;
+      url = `${test_url}/even`;
       break;
     case 'p':
-      url = `${NUMBER_API_URL}/primes`;
+      url = `${test_url}/primes`;
       break;
     case 'f':
-      url = `${NUMBER_API_URL}/fibo`;
+      url = `${test_url}/fibo`;
       break;
     case 'r':
-      url = `${NUMBER_API_URL}/rand`;
+      url = `${test_url}/rand`;
       break;
     default:
       return [];
@@ -42,34 +42,37 @@ async function fetchNumbersByType(type) {
   }
 }
 
-function calculateavgOfList(numbers) {
-  const sum = numbers.reduce((acc, num) => acc + num, 0);
-  return (sum / numbers.length).toFixed(2);
+function calcAvg(numbers) {
+  let sum = 0;
+  for (let i = 0; i < numbers.length; i++) {
+  sum += numbers[i];
+}
+return (sum / numbers.length).toFixed(2);
 }
 
 app.get('/numbers/:type', async (req, res) => {
   const { type } = req.params;
 
-  if (!['p', 'f', 'e', 'r'].includes(type)) {
+  if (['p', 'f', 'e', 'r'].includes(type)==0) {
     return res.status(400).json({ error: 'Invalid number type' });
   }
 
   const newNumbers = await fetchNumbersByType(type);
   const uniqueNumbers = Array.from(new Set(newNumbers));
 
-  const windowPrevState = [...recentNumbers];
+  const windowPrevState = [...nums];
 
   uniqueNumbers.forEach((num) => {
-    if (!recentNumbers.includes(num)) {
-      if (recentNumbers.length >= RECENT_NUMBERS_LIMIT) {
-        recentNumbers.shift();
+    if (!nums.includes(num)) {
+      if (nums.length >= window_lim) {
+        nums.shift();
       }
-      recentNumbers.push(num);
+      nums.push(num);
     }
   });
 
-  const windowCurrState = [...recentNumbers];
-  const avg = calculateavgOfList(windowCurrState);
+  const windowCurrState = [...nums];
+  const avg = calcAvg(windowCurrState);
 
   res.json({
     numbers: uniqueNumbers,
@@ -79,6 +82,6 @@ app.get('/numbers/:type', async (req, res) => {
   });
 });
 
-app.listen(SERVER_PORT, () => {
-  console.log(`running on  port ${SERVER_PORT}`);;
+app.listen(port_no, () => {
+  console.log(`running on  port ${port_no}`);;
 });
