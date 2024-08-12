@@ -80,5 +80,5 @@ app.get('/numbers/:type', async (req, res) => {
 });
 
 app.listen(SERVER_PORT, () => {
-  console.log(`Average Calculator service running on http://localhost:${SERVER_PORT}`);
+  console.log(`Running on http://localhost:${SERVER_PORT}`);
 });
